@@ -1,0 +1,17 @@
+/* RESETS */
+
+body{
+    background: #555;
+    color: #eee;
+    font-family: sans-serif;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.code{
+    color: yellow;
+    padding: 3px 5px;
+    background: #333;
+}
