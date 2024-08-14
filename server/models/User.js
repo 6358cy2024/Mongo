@@ -1,50 +1,55 @@
 const { model, Schema } = require('mongoose');
 const { hash, compare } = require('bcrypt');
-//logging in
+
 const userSchema = new Schema({
-    email: {
-        type: String,
-        unique: true,
-        validate: {
-            validator(val) {
-                return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(val);
-            }
-        }
-    },
-    password: {
-        type: String,
-        require: true,
-        minLength: [6, 'Your password must be at least 6 characters in length']//requirement and err message
-    },
+  email: {
+    type: String,
+    required: true,
+    // Make sure to drop the user collection if it already exists to make the unique functionality work
+    unique: true,
+    validate: {
+      validator(val) {
+        // Validates that the string the user typed is a valid email string
+        return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(val);
+      }
+    }
+  },
 
-    autobots: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Autobot'
-    }]
+  password: {
+    type: String,
+    required: true,
+    minLength: [6, 'Your password must be at least 6 characters in length']
+  },
 
+  autobots: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Autobot'
+  }]
 }, {
-    toJSON: {
-        transform(user) {
-            delete user.password;
-            return user;
-        }
+  // Edit the user's object before it gets sent out in a JSON response to the browser/client
+  toJSON: {
+    transform(user, jsonVal) {
+      delete jsonVal.password;
+      delete jsonVal.__v;
+
+      return jsonVal;
     }
-});
-//API TO JUST ADD GET DELETE AND UPDATE ITEMS IN MONGOOSE, NO AUTH GUESTS CAN DO IT
-
-
-
-userSchema.pre('save', async function() {
-    //check if this is a newly created user and not just a user update
-    if (this.isNew) {
-        this.password = await hash(this.password, 10);
-    }
+  }
 });
 
-userSchema.methods.validatePassword = async function(formPassword) {
-    const is_valid = await compare(this.password, formPassword);
-    return is_valid;
+userSchema.pre('save', async function () {
+  // Check if this is a newly created user and not just a user update
+  if (this.isNew) {
+    this.password = await hash(this.password, 10);
+  }
+});
+
+userSchema.methods.validatePassword = async function (formPassword) {
+  const is_valid = await compare(formPassword, this.password);
+
+  return is_valid;
 }
-const USer = model('User', userSchema);
-//don't forget to go into compass and delete the inital collection for the unique to work
+
+const User = model('User', userSchema);
+
 module.exports = User;
