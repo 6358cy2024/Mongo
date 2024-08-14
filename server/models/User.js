@@ -30,6 +30,7 @@ const userSchema = new Schema({
         }
     }
 });
+//API TO JUST ADD GET DELETE AND UPDATE ITEMS IN MONGOOSE, NO AUTH GUESTS CAN DO IT
 
 
 

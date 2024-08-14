@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
 
-mongoose.connection('mongodb://127.0.0.1:27017/transformer_db');
+mongoose.connect(process.env.DB_URL || 'mongodb://127.0.0.1:27017/transformers_db');
 
 module.exports = mongoose.connection;
